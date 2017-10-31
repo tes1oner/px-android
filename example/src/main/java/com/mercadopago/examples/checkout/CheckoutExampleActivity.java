@@ -18,8 +18,10 @@ import com.mercadopago.examples.utils.ColorPickerDialog;
 import com.mercadopago.examples.utils.ExamplesUtils;
 import com.mercadopago.exceptions.MercadoPagoError;
 import com.mercadopago.model.Payment;
+import com.mercadopago.paymentresult.model.Badge;
 import com.mercadopago.preferences.CheckoutPreference;
 import com.mercadopago.preferences.DecorationPreference;
+import com.mercadopago.preferences.PaymentResultScreenPreference;
 import com.mercadopago.util.JsonUtil;
 import com.mercadopago.util.LayoutUtil;
 
@@ -40,7 +42,7 @@ public class CheckoutExampleActivity extends AppCompatActivity {
     private String mCheckoutPreferenceId;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkout_example);
         mActivity = this;
@@ -61,6 +63,8 @@ public class CheckoutExampleActivity extends AppCompatActivity {
                 startJsonInput();
             }
         });
+
+        mSelectedColor = ContextCompat.getColor(this, R.color.mpsdk_colorPrimary);
     }
 
     public void onContinueClicked(View view) {
@@ -68,11 +72,23 @@ public class CheckoutExampleActivity extends AppCompatActivity {
     }
 
     private void startMercadoPagoCheckout() {
+
+        PaymentResultScreenPreference paymentResultScreenPreference =
+                new PaymentResultScreenPreference.Builder()
+                .setApprovedTitle("Approved title")
+                .setPendingTitle("Pending title")
+                .setRejectedTitle("Rejected title")
+                .setApprovedLabelText("Approved label")
+                .disableRejectedLabelText()
+                .setBadgeApproved(Badge.PENDING_BADGE_IMAGE)
+                .build();
+
         new MercadoPagoCheckout.Builder()
                 .setActivity(this)
                 .setPublicKey(mPublicKey)
                 .setCheckoutPreference(getCheckoutPreference())
                 .setDecorationPreference(getCurrentDecorationPreference())
+                .setPaymentResultScreenPreference(paymentResultScreenPreference)
                 .startForPayment();
     }
 
@@ -82,7 +98,7 @@ public class CheckoutExampleActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         LayoutUtil.showRegularLayout(this);
 
         if (requestCode == MercadoPagoCheckout.CHECKOUT_REQUEST_CODE) {
@@ -111,18 +127,15 @@ public class CheckoutExampleActivity extends AppCompatActivity {
         mRegularLayout.setVisibility(View.VISIBLE);
     }
 
-    public void changeColor(View view) {
-        new ColorPickerDialog(this, mDefaultColor, new ColorPickerDialog.OnColorSelectedListener() {
-            @Override
-            public void onColorSelected(int color) {
-                mDarkFontEnabled.setEnabled(true);
-                mColorSample.setBackgroundColor(color);
-                mSelectedColor = color;
-            }
+    public void changeColor(final View view) {
+        new ColorPickerDialog(this, mDefaultColor, color -> {
+            mDarkFontEnabled.setEnabled(true);
+            mColorSample.setBackgroundColor(color);
+            mSelectedColor = color;
         }).show();
     }
 
-    public void resetSelection(View view) {
+    public void resetSelection(final View view) {
         mSelectedColor = null;
         mColorSample.setBackgroundColor(mDefaultColor);
         mDarkFontEnabled.setChecked(false);
@@ -132,9 +145,11 @@ public class CheckoutExampleActivity extends AppCompatActivity {
     }
 
     private DecorationPreference getCurrentDecorationPreference() {
-        com.mercadopago.preferences.DecorationPreference.Builder decorationPreferenceBuilder = new DecorationPreference.Builder();
+        DecorationPreference.Builder decorationPreferenceBuilder =
+                new DecorationPreference.Builder();
         if (mSelectedColor != null) {
             decorationPreferenceBuilder.setBaseColor(mSelectedColor);
+
             if (mDarkFontEnabled.isChecked()) {
                 decorationPreferenceBuilder.enableDarkFont();
             }

@@ -17,9 +17,6 @@ public class ComponentManager<T> implements ActionDispatcher, MutatorPropsListen
 
     public ComponentManager(@NonNull final Activity activity) {
         this.activity = activity;
-
-        //Register renderers here. For example:
-        //rendererRegistry.put(ExampleComponent.class, ExampleRenderer.class);
     }
 
     public void setComponent(@NonNull final Component component) {
@@ -33,24 +30,25 @@ public class ComponentManager<T> implements ActionDispatcher, MutatorPropsListen
         }
     }
 
-    public void setActionsListener(final ActionsListener actionsListener) {
+    public void setActionsListener(@NonNull final ActionsListener actionsListener) {
         this.actionsListener = actionsListener;
     }
 
     @Override
-    public void dispatch(final Action action) {
+    public void dispatch(@NonNull final Action action) {
         if (actionsListener != null) {
             actionsListener.onAction(action);
         }
     }
 
-    public void setMutator(Mutator mutator) {
+    public void setMutator(@NonNull final Mutator mutator) {
         this.mutator = mutator;
         this.mutator.setPropsListener(this);
     }
 
     @Override
-    public void onProps(T props) {
+    public void onProps(@NonNull final T props) {
+        root.setProps(props);
         root.applyProps(props);
         render();
     }
