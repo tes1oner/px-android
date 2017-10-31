@@ -28,7 +28,6 @@ public class RendererFactory {
             renderer = (Renderer) rendererRegistry.get(component.getClass()).newInstance();
             renderer.setComponent(component);
             renderer.setContext(context);
-            renderer.init();
         } catch (Exception e) {
             Log.e("error", e.getMessage(), e);
         }

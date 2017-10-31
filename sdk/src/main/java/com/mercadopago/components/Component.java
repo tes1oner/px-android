@@ -2,6 +2,7 @@ package com.mercadopago.components;
 
 import android.support.annotation.NonNull;
 
+
 /**
  * Created by vaserber on 10/20/17.
  */
@@ -19,6 +20,8 @@ public abstract class Component<T> {
     public Component(@NonNull final T props, @NonNull final ActionDispatcher dispatcher) {
         this.props = props;
         this.dispatcher = dispatcher;
+        //TODO: move lifecycle methods calls to component manager
+        setProps(props);
         applyProps(props);
     }
 
@@ -26,7 +29,7 @@ public abstract class Component<T> {
         return dispatcher;
     }
 
-    public void setProps(T props) {
+    public void setProps(@NonNull final T props) {
         this.props = props;
     }
 
