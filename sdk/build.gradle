@@ -28,7 +28,7 @@ android {
         minSdkVersion min_api_level.toInteger()
         targetSdkVersion api_level.toInteger()
         versionCode 1
-        versionName '3.6.0'
+        versionName '3.7.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     packagingOptions {
@@ -83,12 +83,6 @@ android {
             buildConfigField "String", "API_VERSION", "\"v1\""
         }
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
 }
 
 project.gradle.taskGraph.whenReady {

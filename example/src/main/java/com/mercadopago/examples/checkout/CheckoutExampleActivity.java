@@ -18,10 +18,8 @@ import com.mercadopago.examples.utils.ColorPickerDialog;
 import com.mercadopago.examples.utils.ExamplesUtils;
 import com.mercadopago.exceptions.MercadoPagoError;
 import com.mercadopago.model.Payment;
-import com.mercadopago.paymentresult.model.Badge;
 import com.mercadopago.preferences.CheckoutPreference;
 import com.mercadopago.preferences.DecorationPreference;
-import com.mercadopago.preferences.PaymentResultScreenPreference;
 import com.mercadopago.util.JsonUtil;
 import com.mercadopago.util.LayoutUtil;
 
@@ -116,11 +114,14 @@ public class CheckoutExampleActivity extends AppCompatActivity {
         mRegularLayout.setVisibility(View.VISIBLE);
     }
 
-    public void changeColor(final View view) {
-        new ColorPickerDialog(this, mDefaultColor, color -> {
-            mDarkFontEnabled.setEnabled(true);
-            mColorSample.setBackgroundColor(color);
-            mSelectedColor = color;
+    public void changeColor(View view) {
+        new ColorPickerDialog(this, mDefaultColor, new ColorPickerDialog.OnColorSelectedListener() {
+            @Override
+            public void onColorSelected(int color) {
+                mDarkFontEnabled.setEnabled(true);
+                mColorSample.setBackgroundColor(color);
+                mSelectedColor = color;
+            }
         }).show();
     }
 
