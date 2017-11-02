@@ -2,7 +2,6 @@ package com.mercadopago.components;
 
 import android.support.annotation.NonNull;
 
-
 /**
  * Created by vaserber on 10/20/17.
  */
