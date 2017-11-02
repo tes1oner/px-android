@@ -8,20 +8,14 @@ import android.support.annotation.NonNull;
 
 public abstract class Component<T> {
 
-    private T props;
+    public T props;
     private final ActionDispatcher dispatcher;
-
-    public Component(@NonNull final ActionDispatcher dispatcher) {
-        this.props = null;
-        this.dispatcher = dispatcher;
-    }
 
     public Component(@NonNull final T props, @NonNull final ActionDispatcher dispatcher) {
         this.props = props;
         this.dispatcher = dispatcher;
         //TODO: move lifecycle methods calls to component manager
         setProps(props);
-        applyProps(props);
     }
 
     public ActionDispatcher getDispatcher() {
@@ -31,11 +25,4 @@ public abstract class Component<T> {
     public void setProps(@NonNull final T props) {
         this.props = props;
     }
-
-    public T getProps() {
-        return props;
-    }
-
-    public abstract void applyProps(@NonNull final T props);
-
 }

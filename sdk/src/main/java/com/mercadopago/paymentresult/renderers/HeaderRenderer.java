@@ -29,25 +29,16 @@ public class HeaderRenderer extends Renderer<HeaderComponent> {
         final ViewGroup iconParentViewGroup = (ViewGroup) headerView.findViewById(R.id.iconContainer);
         final TextView labelTextView = (TextView) headerView.findViewById(R.id.mpsdkHeaderLabel);
 
-        headerContainer.setBackgroundColor(ContextCompat.getColor(context, component.getProps().background));
-        setText(labelTextView, component.getProps().label);
+        headerContainer.setBackgroundColor(ContextCompat.getColor(context, component.props.background));
+        setText(labelTextView, component.props.label);
 
         renderIcon(iconParentViewGroup);
         renderTitle(titleTextView);
 
         //TODO: Reimplementar el body height en un componente.
-//        renderHeight();
 
         return headerView;
     }
-
-//    private void renderHeight() {
-//        if (component.getProps().height.equals("wrap")) {
-//            wrapHeight(headerContainer);
-//        } else if (component.getProps().height.equals("stretch")) {
-//            stretchHeight(headerContainer);
-//        }
-//    }
 
     private void renderIcon(@NonNull final ViewGroup parent) {
         final Renderer iconRenderer = RendererFactory.create(context, component.getIconComponent());
@@ -56,14 +47,25 @@ public class HeaderRenderer extends Renderer<HeaderComponent> {
     }
 
     private void renderTitle(@NonNull final TextView titleTextView) {
-        if (component.getProps().amountFormat == null) {
-            setText(titleTextView, component.getProps().title);
+        if (component.props.amountFormat == null) {
+            setText(titleTextView, component.props.title);
         } else {
-            Spanned formattedTitle = CurrenciesUtil.formatCurrencyInText("<br>",
-                    component.getProps().amountFormat.getAmount(),
-                    component.getProps().amountFormat.getCurrencyId(),
-                    component.getProps().title, false, true);
-            titleTextView.setText(formattedTitle);
+            if (component.props.amountFormat.getPaymentMethodName() == null) {
+                Spanned formattedTitle = CurrenciesUtil.formatCurrencyInText("<br>",
+                        component.props.amountFormat.getAmount(),
+                        component.props.amountFormat.getCurrencyId(),
+                        component.props.title, false, true);
+                titleTextView.setText(formattedTitle);
+            } else {
+                String amount = CurrenciesUtil.formatNumber(component.props.amountFormat.getAmount(),
+                        component.props.amountFormat.getCurrencyId());
+                String title = String.format(component.props.title,
+                        "<br>" + component.props.amountFormat.getPaymentMethodName(),
+                        "<br>" + amount);
+                Spanned formattedTitle = CurrenciesUtil.formatCurrencyInText(component.props.amountFormat.getAmount(),
+                        component.props.amountFormat.getCurrencyId(), title, true, true);
+                titleTextView.setText(formattedTitle);
+            }
         }
     }
 }
