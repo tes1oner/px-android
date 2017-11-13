@@ -15,15 +15,15 @@ import com.mercadopago.exceptions.MercadoPagoError;
 import com.mercadopago.model.ApiException;
 import com.mercadopago.model.PaymentResult;
 import com.mercadopago.model.Site;
+import com.mercadopago.paymentresult.components.Footer;
+import com.mercadopago.paymentresult.components.FooterRenderer;
 import com.mercadopago.paymentresult.components.HeaderComponent;
 import com.mercadopago.paymentresult.components.IconComponent;
 import com.mercadopago.paymentresult.components.PaymentResultBodyComponent;
 import com.mercadopago.paymentresult.components.PaymentResultContainer;
-import com.mercadopago.paymentresult.components.PaymentResultFooterComponent;
 import com.mercadopago.paymentresult.renderers.HeaderRenderer;
 import com.mercadopago.paymentresult.renderers.IconRenderer;
 import com.mercadopago.paymentresult.renderers.PaymentResultBodyRenderer;
-import com.mercadopago.paymentresult.renderers.PaymentResultFooterRenderer;
 import com.mercadopago.paymentresult.renderers.PaymentResultRenderer;
 import com.mercadopago.preferences.PaymentResultScreenPreference;
 import com.mercadopago.util.ApiUtil;
@@ -71,7 +71,7 @@ public class PaymentResultActivity extends AppCompatActivity implements PaymentR
         RendererFactory.register(PaymentResultContainer.class, PaymentResultRenderer.class);
         RendererFactory.register(HeaderComponent.class, HeaderRenderer.class);
         RendererFactory.register(PaymentResultBodyComponent.class, PaymentResultBodyRenderer.class);
-        RendererFactory.register(PaymentResultFooterComponent.class, PaymentResultFooterRenderer.class);
+        RendererFactory.register(Footer.class, FooterRenderer.class);
         RendererFactory.register(IconComponent.class, IconRenderer.class);
         RendererFactory.register(LoadingComponent.class, LoadingRenderer.class);
 

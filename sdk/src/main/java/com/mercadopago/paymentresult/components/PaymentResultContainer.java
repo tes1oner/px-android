@@ -87,10 +87,10 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
         return body;
     }
 
-    public PaymentResultFooterComponent getFooterComponent() {
-        PaymentResultFooterComponent footer = null;
+    public Footer getFooterComponent() {
+        Footer footer = null;
         if (props.paymentResult != null) {
-            footer = new PaymentResultFooterComponent(props.paymentResult.getPaymentStatus(), getDispatcher());
+            footer = new Footer(props.paymentResult.getPaymentStatus(), getDispatcher());
         }
         return footer;
     }
