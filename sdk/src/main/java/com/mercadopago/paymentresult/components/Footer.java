@@ -30,7 +30,7 @@ public class Footer extends Component<Footer.Props> {
         }
     }
 
-    public class FooterAction {
+    public static class FooterAction {
         public final String label;
         public final Action action;
 

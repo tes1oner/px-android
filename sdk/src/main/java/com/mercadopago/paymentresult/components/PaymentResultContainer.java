@@ -3,6 +3,7 @@ package com.mercadopago.paymentresult.components;
 import android.support.annotation.NonNull;
 
 import com.mercadopago.R;
+import com.mercadopago.components.Action;
 import com.mercadopago.components.ActionDispatcher;
 import com.mercadopago.components.Component;
 import com.mercadopago.components.LoadingComponent;
@@ -88,11 +89,12 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
     }
 
     public Footer getFooterComponent() {
-        Footer footer = null;
-        if (props.paymentResult != null) {
-            footer = new Footer(props.paymentResult.getPaymentStatus(), getDispatcher());
-        }
-        return footer;
+        final Footer.Props props = new Footer.Props(
+            new Footer.FooterAction("Hola 1", Action.continueAction()),
+            new Footer.FooterAction("Hola 2", Action.continueAction()),
+            "http://google.com"
+        );
+        return new Footer(props, getDispatcher());
     }
 
     private int getBackground(@NonNull final PaymentResult paymentResult) {

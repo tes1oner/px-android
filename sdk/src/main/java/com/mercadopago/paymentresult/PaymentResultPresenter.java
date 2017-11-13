@@ -183,14 +183,7 @@ public class PaymentResultPresenter extends MvpPresenter<PaymentResultPropsView,
             navigator.showError(new MercadoPagoError(getResourcesProvider().getStandardErrorMessage(), false), ApiUtil.RequestOrigin.GET_INSTRUCTIONS);
         } else {
             getView().setPropInstruction(instruction, new HeaderTitleFormatter(site.getCurrencyId(), amount), false);
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getView().notifyPropsChanged();
-                }
-            }, 3000);
+            getView().notifyPropsChanged();
         }
     }
 
