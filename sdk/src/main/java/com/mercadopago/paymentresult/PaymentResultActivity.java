@@ -61,10 +61,9 @@ public class PaymentResultActivity extends AppCompatActivity implements PaymentR
         presenter = new PaymentResultPresenter(this);
         getActivityParameters();
 
-        PaymentResultProvider provider = new PaymentResultProviderImpl(this, merchantPublicKey, payerAccessToken);
+        final PaymentResultProvider provider = new PaymentResultProviderImpl(this, merchantPublicKey, payerAccessToken);
         presenter.attachView(mutator);
         presenter.attachResourcesProvider(provider);
-
 
         componentManager = new ComponentManager(this);
 
@@ -142,9 +141,9 @@ public class PaymentResultActivity extends AppCompatActivity implements PaymentR
         merchantPublicKey = getIntent().getStringExtra("merchantPublicKey");
         payerAccessToken = getIntent().getStringExtra("payerAccessToken");
         congratsDisplay = getIntent().getIntExtra("congratsDisplay", -1);
-        paymentResultScreenPreference = JsonUtil.getInstance().fromJson(getIntent().getExtras().getString("paymentResultScreenPreference"), PaymentResultScreenPreference.class);
+        paymentResultScreenPreference = JsonUtil.getInstance().fromJson(getIntent().getExtras().getString("preferences"), PaymentResultScreenPreference.class);
 
-        presenter.setPaymentResultScreenPreference(paymentResultScreenPreference);
+        presenter.setPreferences(paymentResultScreenPreference);
     }
 
     @Override

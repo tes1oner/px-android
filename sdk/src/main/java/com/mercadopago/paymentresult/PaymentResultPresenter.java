@@ -1,6 +1,5 @@
 package com.mercadopago.paymentresult;
 
-import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.mercadopago.callbacks.FailureRecovery;
@@ -14,7 +13,6 @@ import com.mercadopago.model.PaymentResult;
 import com.mercadopago.model.Site;
 import com.mercadopago.mvp.MvpPresenter;
 import com.mercadopago.mvp.OnResourcesRetrievedCallback;
-import com.mercadopago.paymentresult.formatter.AmountFormat;
 import com.mercadopago.paymentresult.formatter.HeaderTitleFormatter;
 import com.mercadopago.preferences.PaymentResultScreenPreference;
 import com.mercadopago.util.ApiUtil;
@@ -29,12 +27,13 @@ public class PaymentResultPresenter extends MvpPresenter<PaymentResultPropsView,
     private PaymentResult paymentResult;
     private Site site;
     private BigDecimal amount;
-    private PaymentResultScreenPreference paymentResultScreenPreference;
+    private PaymentResultScreenPreference preferences;
     private PaymentResultNavigator navigator;
     private FailureRecovery failureRecovery;
 
     public PaymentResultPresenter(@NonNull final PaymentResultNavigator navigator) {
         this.navigator = navigator;
+        this.preferences = new PaymentResultScreenPreference.Builder().build();
     }
 
     public void initialize() {
@@ -65,13 +64,11 @@ public class PaymentResultPresenter extends MvpPresenter<PaymentResultPropsView,
         if (isCallForAuthorize()) {
             amountFormat = new HeaderTitleFormatter(site.getCurrencyId(), amount, paymentResult.getPaymentData().getPaymentMethod().getName());
         }
-
         boolean showLoading = false;
         if (hasToAskForInstructions()) {
             showLoading = true;
         }
-        getView().setPropPaymentResult(paymentResult, paymentResultScreenPreference, amountFormat, showLoading);
-
+        getView().setPropPaymentResult(paymentResult, amountFormat, showLoading);
         checkGetInstructions();
     }
 
@@ -79,7 +76,6 @@ public class PaymentResultPresenter extends MvpPresenter<PaymentResultPropsView,
         return paymentResult.getPaymentStatus().equals(Payment.StatusCodes.STATUS_REJECTED) &&
                 paymentResult.getPaymentStatusDetail().equals(Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_CALL_FOR_AUTHORIZE);
     }
-
 
     private boolean isPaymentResultValid() {
         return paymentResult != null && paymentResult.getPaymentStatus() != null && paymentResult.getPaymentStatusDetail() != null;
@@ -101,8 +97,8 @@ public class PaymentResultPresenter extends MvpPresenter<PaymentResultPropsView,
     }
 
     private boolean isPaymentMethodOff() {
-        String paymentStatus = paymentResult.getPaymentStatus();
-        String paymentStatusDetail = paymentResult.getPaymentStatusDetail();
+        final String paymentStatus = paymentResult.getPaymentStatus();
+        final String paymentStatusDetail = paymentResult.getPaymentStatusDetail();
         return paymentStatus.equals(Payment.StatusCodes.STATUS_PENDING) && paymentStatusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_PENDING_WAITING_PAYMENT);
     }
 
@@ -122,8 +118,12 @@ public class PaymentResultPresenter extends MvpPresenter<PaymentResultPropsView,
         this.amount = amount;
     }
 
-    public void setPaymentResultScreenPreference(final PaymentResultScreenPreference paymentResultScreenPreference) {
-        this.paymentResultScreenPreference = paymentResultScreenPreference;
+    public void setPreferences(final PaymentResultScreenPreference preferences) {
+        if (preferences != null) {
+            this.preferences = preferences;
+            getView().setPreferences(this.preferences);
+            getView().notifyPropsChanged();
+        }
     }
 
     private void checkGetInstructions() {
@@ -142,7 +142,7 @@ public class PaymentResultPresenter extends MvpPresenter<PaymentResultPropsView,
         getResourcesProvider().getInstructionsAsync(paymentId, paymentTypeId, new OnResourcesRetrievedCallback<Instructions>() {
             @Override
             public void onSuccess(Instructions instructions) {
-                List<Instruction> instructionsList
+                final List<Instruction> instructionsList
                         = instructions.getInstructions() == null ? new ArrayList<Instruction>() : instructions.getInstructions();
                 if (instructionsList.isEmpty()) {
                     navigator.showError(new MercadoPagoError(getResourcesProvider().getStandardErrorMessage(), false), ApiUtil.RequestOrigin.GET_INSTRUCTIONS);
@@ -178,7 +178,7 @@ public class PaymentResultPresenter extends MvpPresenter<PaymentResultPropsView,
     }
 
     private void resolveInstructions(final List<Instruction> instructionsList) {
-        Instruction instruction = getInstruction(instructionsList);
+        final Instruction instruction = getInstruction(instructionsList);
         if (instruction == null) {
             navigator.showError(new MercadoPagoError(getResourcesProvider().getStandardErrorMessage(), false), ApiUtil.RequestOrigin.GET_INSTRUCTIONS);
         } else {
@@ -188,7 +188,7 @@ public class PaymentResultPresenter extends MvpPresenter<PaymentResultPropsView,
     }
 
     private Instruction getInstruction(final List<Instruction> instructions) {
-        Instruction instruction;
+        final Instruction instruction;
         if (instructions.size() == 1) {
             instruction = instructions.get(0);
         } else {
@@ -209,7 +209,9 @@ public class PaymentResultPresenter extends MvpPresenter<PaymentResultPropsView,
     }
 
     @Override
-    public void onAction(Action action) {
-
+    public void onAction(@NonNull final Action action) {
+        if (Action.TYPE_CONTINUE == action.type) {
+            navigator.finish();
+        }
     }
 }

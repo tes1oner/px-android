@@ -12,4 +12,6 @@ public interface PaymentResultNavigator {
     void showApiExceptionError(ApiException exception, String requestOrigin);
 
     void showError(MercadoPagoError error, String requestOrigin);
+
+    void finish();
 }

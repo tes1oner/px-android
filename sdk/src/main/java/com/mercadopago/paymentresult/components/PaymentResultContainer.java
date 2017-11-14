@@ -16,6 +16,8 @@ import com.mercadopago.paymentresult.model.Badge;
 import com.mercadopago.paymentresult.props.HeaderProps;
 import com.mercadopago.paymentresult.props.PaymentResultBodyProps;
 import com.mercadopago.paymentresult.props.PaymentResultProps;
+import com.mercadopago.preferences.PaymentResultScreenPreference;
+import com.mercadopago.util.TextUtils;
 
 /**
  * Created by vaserber on 10/20/17.
@@ -63,7 +65,7 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
 
     public HeaderComponent getHeaderComponent() {
 
-        HeaderProps headerProps = new HeaderProps.Builder()
+        final HeaderProps headerProps = new HeaderProps.Builder()
                 .setHeight(props.headerMode)
                 .setBackground(getBackground(props.paymentResult))
                 .setStatusBarColor(getStatusBarColor(props.paymentResult))
@@ -89,12 +91,48 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
     }
 
     public Footer getFooterComponent() {
-        final Footer.Props props = new Footer.Props(
-            new Footer.FooterAction("Hola 1", Action.continueAction()),
-            new Footer.FooterAction("Hola 2", Action.continueAction()),
-            "http://google.com"
+
+        return new Footer(getFooterProps(), getDispatcher());
+    }
+
+    private Footer.Props getFooterProps() {
+
+        Footer.FooterAction buttonAction = null;
+        Footer.FooterAction linkAction = null;
+
+        final PaymentResultScreenPreference preferences = props.preferences;
+
+        if (TextUtils.isEmpty(preferences.getExitButtonTitle())) {
+            linkAction = new Footer.FooterAction(resourcesProvider.getExitButtonDefaultText(), Action.continueAction());
+        } else {
+            linkAction = new Footer.FooterAction(preferences.getExitButtonTitle(), Action.continueAction());
+        }
+
+        if (props.paymentResult.isStatusApproved()) {
+
+            if (!preferences.isCongratsSecondaryExitButtonEnabled() ||
+                    preferences.getSecondaryCongratsExitButtonTitle() == null
+                    || preferences.getSecondaryCongratsExitResultCode() == null) {
+                buttonAction = null;
+            } else {
+                buttonAction = new Footer.FooterAction(preferences.getSecondaryCongratsExitButtonTitle(), Action.continueAction());
+            }
+
+        } else if (props.paymentResult.isStatusPending()) {
+
+            if (!preferences.isPendingSecondaryExitButtonEnabled() ||
+                    preferences.getSecondaryPendingExitButtonTitle() == null
+                    || preferences.getSecondaryPendingExitResultCode() == null) {
+                buttonAction = null;
+            } else {
+                buttonAction = new Footer.FooterAction(preferences.getSecondaryPendingExitButtonTitle(), Action.continueAction());
+            }
+
+        }
+
+        return new Footer.Props(
+            buttonAction, linkAction
         );
-        return new Footer(props, getDispatcher());
     }
 
     private int getBackground(@NonNull final PaymentResult paymentResult) {
@@ -132,8 +170,8 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
     }
 
     private boolean isRedBackground(@NonNull final PaymentResult paymentResult) {
-        String status = paymentResult.getPaymentStatus();
-        String statusDetail = paymentResult.getPaymentStatusDetail();
+        final String status = paymentResult.getPaymentStatus();
+        final String statusDetail = paymentResult.getPaymentStatusDetail();
         return status.equals(Payment.StatusCodes.STATUS_REJECTED) &&
                 (statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_OTHER_REASON) ||
                         statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_REJECTED_REJECTED_BY_BANK) ||
@@ -145,8 +183,8 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
     }
 
     private boolean isOrangeBackground(@NonNull final PaymentResult paymentResult) {
-        String status = paymentResult.getPaymentStatus();
-        String statusDetail = paymentResult.getPaymentStatusDetail();
+        final String status = paymentResult.getPaymentStatus();
+        final String statusDetail = paymentResult.getPaymentStatusDetail();
         return status.equals(Payment.StatusCodes.STATUS_REJECTED) &&
                 (statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_INVALID_ESC) ||
                         statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_CALL_FOR_AUTHORIZE) ||
@@ -176,8 +214,8 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
     }
 
     private boolean isItemIconImage(@NonNull final PaymentResult paymentResult) {
-        String status = paymentResult.getPaymentStatus();
-        String statusDetail = paymentResult.getPaymentStatusDetail();
+        final String status = paymentResult.getPaymentStatus();
+        final String statusDetail = paymentResult.getPaymentStatusDetail();
         return status.equals(Payment.StatusCodes.STATUS_APPROVED) ||
                 (status.equals(Payment.StatusCodes.STATUS_PENDING) &&
                         statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_PENDING_WAITING_PAYMENT));
@@ -185,7 +223,7 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
 
     private boolean isCardIconImage(@NonNull final PaymentResult paymentResult) {
         if (isPaymentMethodIconImage(paymentResult)) {
-            String paymentTypeId = paymentResult.getPaymentData().getPaymentMethod().getPaymentTypeId();
+            final String paymentTypeId = paymentResult.getPaymentData().getPaymentMethod().getPaymentTypeId();
             return paymentTypeId.equals(PaymentTypes.PREPAID_CARD) || paymentTypeId.equals(PaymentTypes.DEBIT_CARD) ||
                     paymentTypeId.equals(PaymentTypes.CREDIT_CARD);
         }
@@ -194,15 +232,15 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
 
     private boolean isBoletoIconImage(@NonNull final PaymentResult paymentResult) {
         if (isPaymentMethodIconImage(paymentResult)) {
-            String paymentMethodId = paymentResult.getPaymentData().getPaymentMethod().getId();
+            final String paymentMethodId = paymentResult.getPaymentData().getPaymentMethod().getId();
             return paymentMethodId.equals(PaymentMethods.BRASIL.BOLBRADESCO);
         }
         return false;
     }
 
     private boolean isPaymentMethodIconImage(@NonNull final PaymentResult paymentResult) {
-        String status = paymentResult.getPaymentStatus();
-        String statusDetail = paymentResult.getPaymentStatusDetail();
+        final String status = paymentResult.getPaymentStatus();
+        final String statusDetail = paymentResult.getPaymentStatusDetail();
         return ((status.equals(Payment.StatusCodes.STATUS_PENDING) && !statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_PENDING_WAITING_PAYMENT)) ||
                 status.equals(Payment.StatusCodes.STATUS_IN_PROCESS) ||
                 status.equals(Payment.StatusCodes.STATUS_REJECTED));
@@ -210,7 +248,7 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
 
     private int getBadgeImage(@NonNull final  PaymentResultProps props) {
         if (props.hasCustomizedBadge()) {
-            String badge = props.getPreferenceBadge();
+            final String badge = props.getPreferenceBadge();
             if (badge.equals(Badge.CHECK_BADGE_IMAGE)) {
                 return CHECK_BADGE_IMAGE;
             } else if (badge.equals(Badge.PENDING_BADGE_IMAGE)) {
@@ -243,8 +281,8 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
     }
 
     private boolean isWarningBadgeImage(@NonNull final PaymentResult paymentResult) {
-        String status = paymentResult.getPaymentStatus();
-        String statusDetail = paymentResult.getPaymentStatusDetail();
+        final String status = paymentResult.getPaymentStatus();
+        final String statusDetail = paymentResult.getPaymentStatusDetail();
         return status.equals(Payment.StatusCodes.STATUS_REJECTED) && (statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_INVALID_ESC) ||
                 statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_CALL_FOR_AUTHORIZE) ||
                 statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_BAD_FILLED_CARD_NUMBER) ||
@@ -256,8 +294,8 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
     }
 
     private boolean isErrorBadgeImage(@NonNull final PaymentResult paymentResult) {
-        String status = paymentResult.getPaymentStatus();
-        String statusDetail = paymentResult.getPaymentStatusDetail();
+        final String status = paymentResult.getPaymentStatus();
+        final String statusDetail = paymentResult.getPaymentStatusDetail();
         return status.equals(Payment.StatusCodes.STATUS_REJECTED) && (statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_OTHER_REASON) ||
                 statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_REJECTED_REJECTED_BY_BANK) ||
                 statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_REJECTED_REJECTED_INSUFFICIENT_DATA) ||
@@ -277,9 +315,9 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
         } else if (isPaymentMethodOff(props.paymentResult)) {
             return resourcesProvider.getEmptyText();
         } else {
-            String paymentMethodName = props.paymentResult.getPaymentData().getPaymentMethod().getName();
-            String status = props.paymentResult.getPaymentStatus();
-            String statusDetail = props.paymentResult.getPaymentStatusDetail();
+            final String paymentMethodName = props.paymentResult.getPaymentData().getPaymentMethod().getName();
+            final String status = props.paymentResult.getPaymentStatus();
+            final String statusDetail = props.paymentResult.getPaymentStatusDetail();
 
             if (status.equals(Payment.StatusCodes.STATUS_APPROVED)) {
                 return resourcesProvider.getApprovedTitle();
@@ -334,16 +372,18 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
     }
 
     private boolean isLabelEmpty(@NonNull final PaymentResult paymentResult) {
-        String status = paymentResult.getPaymentStatus();
-        String statusDetail = paymentResult.getPaymentStatusDetail();
+        final String status = paymentResult.getPaymentStatus();
+        final String statusDetail = paymentResult.getPaymentStatusDetail();
         return status.equals(Payment.StatusCodes.STATUS_APPROVED) || status.equals(Payment.StatusCodes.STATUS_IN_PROCESS) ||
-                (status.equals(Payment.StatusCodes.STATUS_PENDING) && !statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_PENDING_WAITING_PAYMENT));
+                (status.equals(Payment.StatusCodes.STATUS_PENDING)
+                        && !statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_PENDING_WAITING_PAYMENT));
     }
 
     private boolean isLabelPending(@NonNull final PaymentResult paymentResult) {
-        String status = paymentResult.getPaymentStatus();
-        String statusDetail = paymentResult.getPaymentStatusDetail();
-        return status.equals(Payment.StatusCodes.STATUS_PENDING) && statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_PENDING_WAITING_PAYMENT);
+        final String status = paymentResult.getPaymentStatus();
+        final String statusDetail = paymentResult.getPaymentStatusDetail();
+        return status.equals(Payment.StatusCodes.STATUS_PENDING)
+                && statusDetail.equals(Payment.StatusCodes.STATUS_DETAIL_PENDING_WAITING_PAYMENT);
     }
 
     private boolean isLabelError(@NonNull final PaymentResult paymentResult) {
@@ -351,7 +391,7 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
     }
 
     private boolean isPaymentMethodOff(@NonNull final PaymentResult paymentResult) {
-        String paymentTypeId = paymentResult.getPaymentData().getPaymentMethod().getPaymentTypeId();
+        final String paymentTypeId = paymentResult.getPaymentData().getPaymentMethod().getPaymentTypeId();
         return paymentTypeId.equals(PaymentTypes.TICKET) || paymentTypeId.equals(PaymentTypes.ATM) || paymentTypeId.equals(PaymentTypes.BANK_TRANSFER);
     }
 }

@@ -34,6 +34,22 @@ public class PaymentResult {
         return paymentStatus;
     }
 
+    public boolean isStatusApproved() {
+        return Payment.StatusCodes.STATUS_APPROVED.equals(paymentStatus);
+    }
+
+    public boolean isStatusRejected() {
+        return Payment.StatusCodes.STATUS_REJECTED.equals(paymentStatus);
+    }
+
+    public boolean isStatusPending() {
+        return Payment.StatusCodes.STATUS_PENDING.equals(paymentStatus);
+    }
+
+    public boolean isStatusDetailCallForAuth() {
+        return Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_CALL_FOR_AUTHORIZE.equals(paymentStatusDetail);
+    }
+
     public String getPaymentStatusDetail() {
         return paymentStatusDetail;
     }

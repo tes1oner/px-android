@@ -2,7 +2,7 @@ package com.mercadopago.components;
 
 public class Action {
 
-    public static final int TYPE_CONTINUE = 0;
+    public static final int TYPE_CONTINUE = 100;
 
     public final int type;
 

@@ -120,4 +120,9 @@ public class PaymentResultProviderImpl implements PaymentResultProvider {
     public String getRejectionLabel() {
         return context.getString(R.string.mpsdk_rejection_label);
     }
+
+    @Override
+    public String getExitButtonDefaultText() {
+        return context.getString(R.string.mpsdk_text_continue);
+    }
 }
