@@ -31,7 +31,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class CallForAuthorizeActivity extends MercadoPagoBaseActivity implements TimerObserver {
 
-    //Controlspa
+    //Controls
     protected MPTextView mTimerTextView;
     protected MPTextView mCallForAuthTitle;
     protected MPTextView mAuthorizedPaymentMethod;
