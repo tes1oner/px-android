@@ -31,13 +31,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class CallForAuthorizeActivity extends MercadoPagoBaseActivity implements TimerObserver {
 
-    private static final String EXTRA_PREFERENCES = "preferences";
-    private static final String EXTRA_MERCHANT_PUBLIC_KEY = "merchantPublicKey";
-    private static final String EXTRA_PAYMENT_RESULT = "paymentResult";
-    private static final String EXTRA_SITE = "site";
-    private static final String EXTRA_NEXT_ACTION = "nextAction";
-
-    //Controls
+    //Controlspa
     protected MPTextView mTimerTextView;
     protected MPTextView mCallForAuthTitle;
     protected MPTextView mAuthorizedPaymentMethod;
@@ -85,10 +79,10 @@ public class CallForAuthorizeActivity extends MercadoPagoBaseActivity implements
     }
 
     protected void getActivityParameters() {
-        mMerchantPublicKey = getIntent().getStringExtra(EXTRA_MERCHANT_PUBLIC_KEY);
-        mPaymentResult = JsonUtil.getInstance().fromJson(getIntent().getExtras().getString(EXTRA_PAYMENT_RESULT), PaymentResult.class);
-        mPaymentResultScreenPreference = JsonUtil.getInstance().fromJson(getIntent().getStringExtra(EXTRA_PREFERENCES), PaymentResultScreenPreference.class);
-        mSite = JsonUtil.getInstance().fromJson(getIntent().getExtras().getString(EXTRA_SITE), Site.class);
+        mMerchantPublicKey = getIntent().getStringExtra("merchantPublicKey");
+        mPaymentResult = JsonUtil.getInstance().fromJson(getIntent().getExtras().getString("paymentResult"), PaymentResult.class);
+        mPaymentResultScreenPreference = JsonUtil.getInstance().fromJson(getIntent().getStringExtra("paymentResultScreenPreference"), PaymentResultScreenPreference.class);
+        mSite = JsonUtil.getInstance().fromJson(getIntent().getExtras().getString("site"), Site.class);
     }
 
     protected void validateActivityParameters() throws IllegalStateException {
@@ -112,7 +106,7 @@ public class CallForAuthorizeActivity extends MercadoPagoBaseActivity implements
             public void onClick(View v) {
                 Intent returnIntent = new Intent();
                 mNextAction = PaymentResultAction.RECOVER_PAYMENT;
-                returnIntent.putExtra(EXTRA_NEXT_ACTION, mNextAction);
+                returnIntent.putExtra("nextAction", mNextAction);
                 setResult(RESULT_CANCELED, returnIntent);
                 finish();
             }
@@ -123,7 +117,7 @@ public class CallForAuthorizeActivity extends MercadoPagoBaseActivity implements
             public void onClick(View v) {
                 Intent returnIntent = new Intent();
                 mNextAction = PaymentResultAction.SELECT_OTHER_PAYMENT_METHOD;
-                returnIntent.putExtra(EXTRA_NEXT_ACTION, mNextAction);
+                returnIntent.putExtra("nextAction", mNextAction);
                 setResult(RESULT_CANCELED, returnIntent);
                 finish();
             }
@@ -223,8 +217,9 @@ public class CallForAuthorizeActivity extends MercadoPagoBaseActivity implements
 
     private void setDescription() {
         if (isPaymentMethodValid() && isCurrencyIdValid() && isTotalPaidAmountValid()) {
-            final String totalPaidAmount = CurrenciesUtil.formatNumber(mTotalAmount, mCurrencyId);
-            final String titleWithFormat = String.format(getString(R.string.mpsdk_title_activity_call_for_authorize), "<br>" + mPaymentMethodName, "<br>" + totalPaidAmount);
+            String totalPaidAmount = CurrenciesUtil.formatNumber(mTotalAmount, mCurrencyId);
+            String titleWithFormat = String.format(getString(R.string.mpsdk_title_activity_call_for_authorize), "<br>" + mPaymentMethodName, "<br>" + totalPaidAmount);
+
             mCallForAuthTitle.setText(CurrenciesUtil.formatCurrencyInText(mTotalAmount, mCurrencyId, titleWithFormat, true, true));
         } else {
             mCallForAuthTitle.setText(getString(R.string.mpsdk_error_title_activity_call_for_authorize));
