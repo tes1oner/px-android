@@ -42,4 +42,8 @@ public interface PaymentResultProvider extends ResourcesProvider {
     String getRejectionLabel();
 
     String getExitButtonDefaultText();
+
+    String getChengePaymentMethodLabel();
+
+    String getRecoverPayment();
 }

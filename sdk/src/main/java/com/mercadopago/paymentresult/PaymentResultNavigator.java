@@ -13,5 +13,9 @@ public interface PaymentResultNavigator {
 
     void showError(MercadoPagoError error, String requestOrigin);
 
-    void finish();
+    void finishWithResult(final int resultCode);
+
+    void changePaymentMethod();
+
+    void recoverPayment();
 }

@@ -20,10 +20,10 @@ public class PaymentResultProviderImpl implements PaymentResultProvider {
         this.context = context;
 
         this.mercadoPago = new MercadoPagoServices.Builder()
-                .setContext(context)
-                .setPublicKey(publicKey)
-                .setPrivateKey(privateKey)
-                .build();
+            .setContext(context)
+            .setPublicKey(publicKey)
+            .setPrivateKey(privateKey)
+            .build();
     }
 
     @Override
@@ -123,6 +123,16 @@ public class PaymentResultProviderImpl implements PaymentResultProvider {
 
     @Override
     public String getExitButtonDefaultText() {
-        return context.getString(R.string.mpsdk_text_continue);
+        return context.getString(R.string.mpsdk_cancel_payment);
+    }
+
+    @Override
+    public String getChengePaymentMethodLabel() {
+        return context.getString(R.string.mpsdk_text_pay_with_other_method);
+    }
+
+    @Override
+    public String getRecoverPayment() {
+        return context.getString(R.string.mpsdk_text_enter_again);
     }
 }

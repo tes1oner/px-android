@@ -3,10 +3,12 @@ package com.mercadopago.paymentresult.components;
 import android.support.annotation.NonNull;
 
 import com.mercadopago.R;
-import com.mercadopago.components.Action;
 import com.mercadopago.components.ActionDispatcher;
+import com.mercadopago.components.ChangePaymentMethodAction;
 import com.mercadopago.components.Component;
 import com.mercadopago.components.LoadingComponent;
+import com.mercadopago.components.RecoverPaymentAction;
+import com.mercadopago.components.ResultCodeAction;
 import com.mercadopago.constants.PaymentMethods;
 import com.mercadopago.constants.PaymentTypes;
 import com.mercadopago.model.Payment;
@@ -97,15 +99,19 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
 
     private Footer.Props getFooterProps() {
 
-        Footer.FooterAction buttonAction = null;
-        Footer.FooterAction linkAction = null;
+        Footer.FooterAction buttonAction = new Footer.FooterAction(
+            resourcesProvider.getChengePaymentMethodLabel(),
+            new ChangePaymentMethodAction()
+        );
+
+        Footer.FooterAction linkAction;
 
         final PaymentResultScreenPreference preferences = props.preferences;
 
         if (TextUtils.isEmpty(preferences.getExitButtonTitle())) {
-            linkAction = new Footer.FooterAction(resourcesProvider.getExitButtonDefaultText(), Action.continueAction());
+            linkAction = new Footer.FooterAction(resourcesProvider.getExitButtonDefaultText());
         } else {
-            linkAction = new Footer.FooterAction(preferences.getExitButtonTitle(), Action.continueAction());
+            linkAction = new Footer.FooterAction(preferences.getExitButtonTitle());
         }
 
         if (props.paymentResult.isStatusApproved()) {
@@ -115,7 +121,10 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
                     || preferences.getSecondaryCongratsExitResultCode() == null) {
                 buttonAction = null;
             } else {
-                buttonAction = new Footer.FooterAction(preferences.getSecondaryCongratsExitButtonTitle(), Action.continueAction());
+                buttonAction = new Footer.FooterAction(
+                    preferences.getSecondaryCongratsExitButtonTitle(),
+                    new ResultCodeAction(preferences.getSecondaryCongratsExitResultCode())
+                );
             }
 
         } else if (props.paymentResult.isStatusPending()) {
@@ -125,9 +134,27 @@ public class PaymentResultContainer extends Component<PaymentResultProps> {
                     || preferences.getSecondaryPendingExitResultCode() == null) {
                 buttonAction = null;
             } else {
-                buttonAction = new Footer.FooterAction(preferences.getSecondaryPendingExitButtonTitle(), Action.continueAction());
+                buttonAction = new Footer.FooterAction(
+                    preferences.getSecondaryPendingExitButtonTitle(),
+                    new ResultCodeAction(preferences.getSecondaryPendingExitResultCode())
+                );
             }
 
+        } else if (props.paymentResult.isStatusRejected()) {
+            if (Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_BAD_FILLED_CARD_NUMBER
+                    .equals(props.paymentResult.getPaymentStatusDetail())
+                || Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_BAD_FILLED_DATE
+                    .equals(props.paymentResult.getPaymentStatusDetail())
+                || Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_BAD_FILLED_SECURITY_CODE
+                    .equals(props.paymentResult.getPaymentStatusDetail())
+                || Payment.StatusCodes.STATUS_DETAIL_CC_REJECTED_BAD_FILLED_OTHER
+                    .equals(props.paymentResult.getPaymentStatusDetail())) {
+
+                buttonAction = new Footer.FooterAction(
+                    resourcesProvider.getRecoverPayment(),
+                    new RecoverPaymentAction()
+                );
+            }
         }
 
         return new Footer.Props(

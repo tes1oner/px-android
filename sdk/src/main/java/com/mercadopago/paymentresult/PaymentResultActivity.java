@@ -14,6 +14,7 @@ import com.mercadopago.core.MercadoPagoComponents;
 import com.mercadopago.exceptions.MercadoPagoError;
 import com.mercadopago.model.ApiException;
 import com.mercadopago.model.PaymentResult;
+import com.mercadopago.model.PaymentResultAction;
 import com.mercadopago.model.Site;
 import com.mercadopago.paymentresult.components.Footer;
 import com.mercadopago.paymentresult.components.FooterRenderer;
@@ -42,6 +43,8 @@ public class PaymentResultActivity extends AppCompatActivity implements PaymentR
     public static final String SERVICE_PREFERENCE_BUNDLE = "servicePreference";
 
     public static final String PRESENTER_BUNDLE = "presenter";
+
+    private static final String EXTRA_NEXT_ACTION = "nextAction";
 
     private PaymentResultPresenter presenter;
 
@@ -186,6 +189,32 @@ public class PaymentResultActivity extends AppCompatActivity implements PaymentR
 
     private void finishWithOkResult(final int resultCode, final Intent data) {
         setResult(resultCode, data);
+        finish();
+    }
+
+    @Override
+    public void finishWithResult(int resultCode) {
+        final Intent intent = new Intent();
+        intent.putExtra("resultCode", resultCode);
+        setResult(resultCode, intent);
+        finish();
+    }
+
+    @Override
+    public void changePaymentMethod() {
+        final Intent returnIntent = new Intent();
+        final String action = PaymentResultAction.SELECT_OTHER_PAYMENT_METHOD;
+        returnIntent.putExtra(EXTRA_NEXT_ACTION, action);
+        setResult(RESULT_CANCELED, returnIntent);
+        finish();
+    }
+
+    @Override
+    public void recoverPayment() {
+        final Intent returnIntent = new Intent();
+        final String action = PaymentResultAction.RECOVER_PAYMENT;
+        returnIntent.putExtra(EXTRA_NEXT_ACTION, action);
+        setResult(RESULT_CANCELED, returnIntent);
         finish();
     }
 }

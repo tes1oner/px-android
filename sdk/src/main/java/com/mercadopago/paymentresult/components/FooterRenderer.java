@@ -33,15 +33,15 @@ public class FooterRenderer extends Renderer<Footer> {
 
         view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
+            public void onClick(final View v) {
+                component.getDispatcher().dispatch(component.props.buttonAction.action);
             }
         });
 
         view.findViewById(R.id.link).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
+            public void onClick(final View v) {
+                component.getDispatcher().dispatch(component.props.linkAction.action);
             }
         });
 

@@ -29,7 +29,11 @@ public class Footer extends Component<Footer.Props> {
         public final String label;
         public final Action action;
 
-        public FooterAction(String label, Action action) {
+        public FooterAction(final String label) {
+            this(label, Action.continueAction());
+        }
+
+        public FooterAction(final String label, final Action action) {
             this.label = label;
             this.action = action;
         }
