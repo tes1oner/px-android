@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.mercadopago.util.TextUtils;
+
 
 /**
  * Created by vaserber on 10/20/17.
@@ -68,7 +70,7 @@ public abstract class Renderer<T extends Component> {
     //TODO: move to Text component
     @Deprecated
     protected void setText(@NonNull final TextView view, String text) {
-        if (text.isEmpty()) {
+        if(TextUtils.isEmpty(text)) {
             view.setVisibility(View.GONE);
         } else {
             view.setText(text);
